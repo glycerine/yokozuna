@@ -16,7 +16,7 @@ index(Core, O) ->
 %% @doc Pings a random vnode to make sure communication is functional
 ping() ->
     DocIdx = riak_core_util:chash_key({<<"ping">>, term_to_binary(now())}),
-    PrefList = riak_core_apl:get_primary_apl(DocIdx, 1, yokozuna),
+    PrefList = riak_core_apl:get_primary_apl(DocIdx, 1, ?YZ_SVC_NAME),
     [{IndexNode, _Type}] = PrefList,
     riak_core_vnode_master:sync_spawn_command(IndexNode, ping,
                                               ?YZ_VNODE_MASTER).
@@ -27,13 +27,12 @@ covering_nodes() ->
     NVal = 3,
     NumPrimaries = 1,
     ReqId = erlang:phash2(erlang:now()),
-    Service = yokozuna,
 
     {CoveringSet, _} = riak_core_coverage_plan:create_plan(Selector,
                                                            NVal,
                                                            NumPrimaries,
                                                            ReqId,
-                                                           Service),
+                                                           ?YZ_SVC_NAME),
     lists:usort([Node || {_, Node} <- CoveringSet]).
 
 install_postcommit(Bucket) when is_binary(Bucket) ->

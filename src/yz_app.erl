@@ -34,7 +34,7 @@ add_routes(Routes) ->
 
 register_app() ->
     Modules = [{vnode_module, yz_vnode}],
-    riak_core:register(yokozuna, Modules).
+    riak_core:register(?YZ_SVC_NAME, Modules).
 
 start_solr(Dir) ->
     case yz_solr:ping() of
