@@ -1,4 +1,4 @@
--module(yokozuna_sup).
+-module(yz_sup).
 -behaviour(supervisor).
 
 -export([start_link/0]).
@@ -18,8 +18,8 @@ start_link() ->
 %%%===================================================================
 
 init(_Args) ->
-    VMaster = {yokozuna_vnode_master,
-               {riak_core_vnode_master, start_link, [yokozuna_vnode]},
+    VMaster = {yz_vnode_master,
+               {riak_core_vnode_master, start_link, [yz_vnode]},
                permanent, 5000, worker, [riak_core_vnode_master]},
 
     {ok, {{one_for_one, 5, 10}, [VMaster]}}.

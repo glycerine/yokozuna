@@ -11,14 +11,14 @@
 %% @doc Index the given object `O'.
 -spec index(string(), riak_object:riak_object()) -> ok | {error, term()}.
 index(Core, O) ->
-    yokozuna_solr:index(Core, [make_doc(O)]).
+    yz_solr:index(Core, [make_doc(O)]).
 
 %% @doc Pings a random vnode to make sure communication is functional
 ping() ->
     DocIdx = riak_core_util:chash_key({<<"ping">>, term_to_binary(now())}),
     PrefList = riak_core_apl:get_primary_apl(DocIdx, 1, yokozuna),
     [{IndexNode, _Type}] = PrefList,
-    riak_core_vnode_master:sync_spawn_command(IndexNode, ping, yokozuna_vnode_master).
+    riak_core_vnode_master:sync_spawn_command(IndexNode, ping, yz_vnode_master).
 
 covering_nodes() ->
     Selector = all,
@@ -57,13 +57,13 @@ postcommit(RO) ->
     Preflist = riak_core_apl:get_apl(Idx, NVal, Ring, UpNodes),
     Doc = make_doc(RO),
     Index = Bucket,
-    yokozuna_vnode:index(Preflist, binary_to_list(Index), Doc, ReqId).
+    yz_vnode:index(Preflist, binary_to_list(Index), Doc, ReqId).
 
 search(Core, Query, Mapping) ->
-    yokozuna_solr:search(Core, [{q, Query}], Mapping).
+    yz_solr:search(Core, [{q, Query}], Mapping).
 
 node_hostport_mapping() ->
-    {Ports, []} = riak_core_util:rpc_every_member_ann(yokozuna_solr, port,
+    {Ports, []} = riak_core_util:rpc_every_member_ann(yz_solr, port,
                                                       [], 5000),
     [{Node, {hostname(Node), Port}} || {Node, Port} <- Ports].
 
@@ -134,16 +134,16 @@ test_it(Core) ->
     O5 = riak_object:new(B, <<"celery">>, <<"4">>),
     O6 = riak_object:new(B, <<"lime">>, <<"1">>),
     [index(Core, O) || O <- [O1, O2, O3, O4, O5, O6]],
-    yokozuna_solr:commit(Core).
+    yz_solr:commit(Core).
 
 demo_write_objs(Core) ->
     ibrowse:start(),
     write_n_objs(Core, 1000),
-    yokozuna_solr:commit(Core).
+    yz_solr:commit(Core).
 
 demo_build_tree(Name, Core) ->
     ibrowse:start(),
-    TP = yokozuna_entropy:new_tree_proc(Name, Core),
+    TP = yz_entropy:new_tree_proc(Name, Core),
     Pid = element(3, TP),
     Ref = make_ref(),
     Pid ! {get_tree, self(), Ref},
@@ -160,13 +160,13 @@ demo_new_vclock(Core, N) ->
     O = riak_object:new(B, K, V),
     O2 = riak_object:increment_vclock(O, dummy_node),
     index(Core, O2),
-    yokozuna_solr:commit(Core).
+    yz_solr:commit(Core).
 
 demo_delete(Core, N) ->
     NS = integer_to_list(N),
     K = "key_" ++ NS,
-    ok = yokozuna_solr:delete(Core, {id,K}),
-    ok = yokozuna_solr:commit(Core).
+    ok = yz_solr:delete(Core, {id,K}),
+    ok = yz_solr:commit(Core).
 
 write_n_objs(_, 0) ->
     ok;
