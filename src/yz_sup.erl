@@ -1,6 +1,6 @@
 -module(yz_sup).
 -behaviour(supervisor).
-
+-include("yokozuna.hrl").
 -export([start_link/0]).
 -export([init/1]).
 
@@ -18,7 +18,7 @@ start_link() ->
 %%%===================================================================
 
 init(_Args) ->
-    VMaster = {yz_vnode_master,
+    VMaster = {?YZ_VNODE_MASTER,
                {riak_core_vnode_master, start_link, [yz_vnode]},
                permanent, 5000, worker, [riak_core_vnode_master]},
 

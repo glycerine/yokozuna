@@ -58,4 +58,4 @@
 -define(YZ_SEARCH_CMD, #yz_search_cmd).
 -define(YZ_APP_NAME, yokozuna).
 -define(YZ_SVC_NAME, yokozuna).
--define(YZ_VNODE_MASTER, yokozuna_vnode_master).
+-define(YZ_VNODE_MASTER, yz_vnode_master).
