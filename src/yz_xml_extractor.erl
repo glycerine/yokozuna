@@ -27,12 +27,6 @@
          }).
 -define(NO_OPTIONS, []).
 
--type opts() :: proplists:proplist().
--type field() :: binary().
--type value() :: binary().
--type obj() :: any().
-
--spec extract(obj(), opts()) -> [{field(), value()}].
 extract(Values) ->
     extract(Values, ?NO_OPTIONS).
 
