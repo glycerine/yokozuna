@@ -52,6 +52,10 @@ get(C, Bucket, Key) ->
             Other
     end.
 
+-spec get_obj_ct(riak_object:riak_object()) -> binary().
+get_obj_ct(Obj) ->
+    dict:fetch(<<"content-type">>, riak_object:get_metadata(Obj)).
+
 %% @doc An object modified hook to create indexes as object data is
 %% written or modified.
 %%

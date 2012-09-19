@@ -59,6 +59,7 @@
 -type doc() :: {doc, fields()}.
 -type base64() :: binary().
 -type ordset(T) :: ordsets:ordset(T).
+-type proplist() :: proplists:proplist().
 -type ring() :: riak_core_ring:riak_core_ring().
 -type solr_vclocks() :: #solr_vclocks{}.
 -type iso8601() :: string().
