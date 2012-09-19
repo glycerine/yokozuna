@@ -48,7 +48,7 @@ extract(RiakObject, DefaultField) ->
 % extract_value(Data, DefaultField) ->
 %     [{DefaultField, Data}].
 extract_value(Data, DefaultField) ->
-    [[[], Header]|_] = re:split(Data3, "^\-{3}$(.+?)^\-{3}$", [{return,list},group,dotall,multiline]),
+    [[[], Header]|_] = re:split(Data, "^\-{3}$(.+?)^\-{3}$", [{return,list},group,dotall,multiline]),
     Lines = string:tokens(Header, "\n"),
     Yaml = parse(Lines),
     % Json = mochijson2:decode(Data),
