@@ -33,12 +33,11 @@
 -type obj() :: any().
 
 -spec extract(obj(), opts()) -> [{field(), value()}].
-extract(Obj) ->
-    extract(Obj, ?NO_OPTIONS).
+extract(Values) ->
+    extract(Values, ?NO_OPTIONS).
 
-extract(Obj, _Opts) ->
+extract(Values, _Opts) ->
     try
-        Values = riak_object:get_values(Obj),
         %% TODO: What to do for multiple values of the same field?
         %% Perhaps merge them?  What does it mean to index an object
         %% with siblings?
