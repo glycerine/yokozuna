@@ -19,10 +19,10 @@
 %% -------------------------------------------------------------------
 
 -module(yz_riakdoc_extractor).
--compile(export_all).
+% -compile(export_all).
 -include("yokozuna.hrl").
--export([extract/2,
-	     extract_value/2]).
+-export([extract/1, extract/2]).
+-define(NO_OPTIONS, []).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -30,28 +30,28 @@
 
 %% @doc Extracts middleman frontmatter into Solr index.
 
+-type obj() :: any().
 -type opts() :: proplists:proplist().
-% -type field() :: binary().
-% -type value() :: binary().
-% -type obj() :: riak_object:riak_object().
 
--spec extract(riak_object:riak_object(), opts()) -> [{field(), value()}] | {error, any()}.
-extract(RiakObject, DefaultField) ->
-    try
-        Values = riak_object:get_values(RiakObject),
-        lists:flatten([extract_value(V, DefaultField) || V <- Values])
-    catch
-        _:Err ->
-            {fail, {cannot_parse_yaml,Err}}
-    end.
+-spec extract(obj(), opts()) -> [{field(), value()}].
 
-% extract_value(Data, DefaultField) ->
-%     [{DefaultField, Data}].
+% -spec extract(obj(), opts()) -> [{field(), value()}] | {error, any()}.
+extract(Values) ->
+    extract(Values, ?NO_OPTIONS).
+
+extract(Values, _Opts) ->
+    % try
+    % Values = riak_object:get_values(RiakObject),
+    lists:flatten([extract_value(V, "text") || V <- Values])
+    % catch
+    %     _:Err ->
+    %         {fail, {cannot_parse_yaml,Err}}
+    % end.
+
 extract_value(Data, DefaultField) ->
     [[[], Header]|_] = re:split(Data, "^\-{3}$(.+?)^\-{3}$", [{return,list},group,dotall,multiline]),
     Lines = string:tokens(Header, "\n"),
     Yaml = parse(Lines),
-    % Json = mochijson2:decode(Data),
     Fields = lists:reverse(lists:flatten(make_search_fields(undefined, Yaml, DefaultField, []))),
     [{to_utf8(FieldName), to_utf8(FieldValue)} || {FieldName, FieldValue} <- Fields].
 
@@ -102,7 +102,8 @@ append_fieldname(FieldPrefix, Name) ->
 search_fieldname(undefined, DefaultField) ->
     DefaultField;
 search_fieldname(Name, _) ->
-    riak_search_kv_extractor:clean_name(Name).
+    Name.
+    % riak_search_kv_extractor:clean_name(Name).
 
 
 % parse a yaml file, represented as a list of lines by Oliver Mason.
@@ -110,7 +111,6 @@ search_fieldname(Name, _) ->
 % version 0.1
 % - able to parse basic lists and mappings, but not yet
 %   shortcut expressions.
-
 
 parse([]) -> [];
 parse(Lines) ->
