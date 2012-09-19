@@ -28,9 +28,9 @@
 -type field_value() :: {binary(), binary()}.
 
 -define(DEFAULT_MAP, [{default, yz_text_extractor},
-                      {<<"text/plain">>, yz_text_extractor},
-                      {<<"application/xml">>, yz_xml_extractor},
-                      {<<"text/xml">>, yz_xml_extractor}]).
+                      {"text/plain", yz_text_extractor},
+                      {"application/xml", yz_xml_extractor},
+                      {"text/xml", yz_xml_extractor}]).
 -define(META_EXTRACTOR_MAP, yokozuna_extractor_map).
 
 %% @doc Get the extractor definition for the given mime type.  Throw
@@ -42,7 +42,16 @@ get_def(MimeType) ->
         {ok, {_, _}=ModuleOpts} -> ModuleOpts;
         {ok, Module} -> Module;
         error ->
-            throw({no_extractor_def, MimeType, Map})
+            case get_default(Map) of
+                error -> throw({no_extractor_def, MimeType, Map});
+                Def -> Def
+            end
+    end.
+
+get_default(Map) ->
+    case orddict:find(default, Map) of
+        {ok, Def} -> Def;
+        error -> error
     end.
 
 -spec get_map() -> extractor_map().
