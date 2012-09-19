@@ -70,7 +70,7 @@ sax_cb({endElement, _Uri, _Name, _QualName}, _Location, S) ->
 %% Got a value, set it to the value of the topmost element in the stack...
 sax_cb({characters, Value}, _Location, S) ->
     Name = make_name(S#state.field_separator, S#state.name_stack),
-    Field = {Name, Value},
+    Field = {Name, list_to_binary(Value)},
     S#state{fields = [Field|S#state.fields]};
 
 sax_cb(_Event, _Location, State) ->
@@ -80,7 +80,8 @@ sax_cb(_Event, _Location, State) ->
 make_attr_fields(_BaseName, [], Fields) ->
     Fields;
 make_attr_fields(BaseName, [{_Uri, _Prefix, AttrName, Value}|Attrs], Fields) ->
-    FieldName = <<BaseName/binary,$@,AttrName/binary>>,
+    AttrNameB = list_to_binary(AttrName),
+    FieldName = <<BaseName/binary,$@,AttrNameB/binary>>,
     Field = {FieldName, Value},
     make_attr_fields(BaseName, Attrs, [Field | Fields]).
 
@@ -88,11 +89,17 @@ make_name(Seperator, Stack) ->
     make_name(Seperator, Stack, <<>>).
 
 %% Make a name from a stack of visted tags (innermost tag at head of list)
--spec make_name(binary(), [binary()], binary()) -> binary().
+-spec make_name(binary(), [string()], binary()) -> binary().
 make_name(Seperator, [Inner,Outter|Rest], Name) ->
-    Name2 = <<Outter/binary,Seperator/binary,Inner/binary,Name/binary>>,
+    OutterB = list_to_binary(Outter),
+    InnerB = list_to_binary(Inner),
+    Name2 = <<OutterB/binary,Seperator/binary,InnerB/binary,Name/binary>>,
     make_name(Seperator, Rest, Name2);
 make_name(Seperator, [Outter], Name) ->
-    <<Outter/binary,Seperator/binary,Name/binary>>;
+    OutterB = list_to_binary(Outter),
+    case Name of
+        <<>> -> OutterB;
+        _ -> <<OutterB/binary,Seperator/binary,Name/binary>>
+    end;
 make_name(_, [], Name) ->
     Name.
