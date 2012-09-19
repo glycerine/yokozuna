@@ -76,6 +76,10 @@ build.  The following instructions assume a devrel.
         for d in dev/dev*; do $d/bin/riak start; done
         for d in dev/dev*; do $d/bin/riak ping; done
 
+   If you're really pressed for time, you can start in parallel.
+
+        for d in dev/dev*; do { $d/bin/riak start & } 2> /dev/null ; done; wait 2> /dev/null
+
 2. Join the nodes.  I am using the force (`-f`) option here as this is
    just a development release.  In a production environment you should
    use the new cluster staging commands as they are more efficient
