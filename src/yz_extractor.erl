@@ -25,6 +25,7 @@
 -type mime_type() :: binary() | default.
 -type extractor_def() :: module() | {module(), proplist()}.
 -type extractor_map() :: orddict(mime_type(), extractor_def()).
+-type field_value() :: {binary(), binary()}.
 
 -define(DEFAULT_MAP, [{default, yz_text_extractor},
                       {<<"text/plain">>, yz_text_extractor},
@@ -51,3 +52,9 @@ get_map() ->
         {ok, Map} -> Map;
         undefined -> ?DEFAULT_MAP
     end.
+
+-spec run([binary()], extractor_def()) -> [field_value()].
+run(Values, {Module, Opts}) ->
+    Module:extract(Values, Opts);
+run(Values, Module) ->
+    Module:extract(Values, []).
