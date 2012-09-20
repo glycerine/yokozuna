@@ -40,13 +40,7 @@ extract(Values) ->
     extract(Values, ?NO_OPTIONS).
 
 extract(Values, _Opts) ->
-    % try
-    % Values = riak_object:get_values(RiakObject),
-    lists:flatten([extract_value(V, "text") || V <- Values])
-    % catch
-    %     _:Err ->
-    %         {fail, {cannot_parse_yaml,Err}}
-    % end.
+    lists:flatten([extract_value(V, "text") || V <- Values]).
 
 extract_value(Data, DefaultField) ->
     [[[], Header]|_] = re:split(Data, "^\-{3}$(.+?)^\-{3}$", [{return,list},group,dotall,multiline]),

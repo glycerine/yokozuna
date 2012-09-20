@@ -62,6 +62,11 @@ get_map() ->
         undefined -> ?DEFAULT_MAP
     end.
 
+-spec update_map(binary(), extractor_def()) -> any().
+update_map(Mime, Module) ->
+    {ok, Ring} = riak_core_ring_manager:get_my_ring(),
+    riak_core_ring:update_meta(?META_EXTRACTOR_MAP, {Mime, Module}, Ring).
+
 -spec run([binary()], extractor_def()) -> [field_value()].
 run(Values, {Module, Opts}) ->
     Module:extract(Values, Opts);
